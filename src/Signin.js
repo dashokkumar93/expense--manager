@@ -1,5 +1,5 @@
 import React,{Component} from 'react'
-import {Button}from 'react-mdl'
+import {Button,Grid,Cell}from 'react-mdl'
 import firebase, { auth, provider } from './FirebaseAuth';
 
 class Signin extends Component{
@@ -14,22 +14,37 @@ class Signin extends Component{
       user: null 
     }
      }
+  componentDidMount()
+  {  var base=this;
+    firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+   base.setState({
+        user:user
+      });
+  } else {
+      base.setState({
+        user:null
+      });
+  }
+});
+
+  }
     login(){
  
-          auth.signInWithPopup(provider) 
+          auth.signInWithRedirect(provider) 
     .then((result) => {
       const user = result.user;
       this.setState({
-        user
+        user:user
       });
     });
     }
     render(){
         return(
-            <div>
-              
-            <Button className="signIn__Button"raised ripple accent onClick={this.login}>Sign In</Button>
-        </div>
+             <Grid>
+               <Cell col={4}></Cell><Cell style={{textAlign: "center"}}col={4}> 
+            <Button className="signIn__Button"raised ripple accent onClick={this.login}>Sign In</Button></Cell>
+        </Grid>
         )
     }
 }
