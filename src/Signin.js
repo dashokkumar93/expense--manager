@@ -13,10 +13,12 @@ class Signin extends Component{
       items: [],
       user: null 
     }
+	console.log(firebase.auth().currentUser);
      }
   componentDidMount()
   {  var base=this;
     firebase.auth().onAuthStateChanged(function(user) {
+		console.log(user)
   if (user) {
    base.setState({
         user:user
