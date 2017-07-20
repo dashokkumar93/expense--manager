@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Textfield, Button, Grid, Cell} from 'react-mdl';
-
+import GetValues from "./getValues";
 import firebase from './FirebaseAuth';
 class Main extends Component {
   constructor() {
@@ -11,9 +11,11 @@ class Main extends Component {
       expenseAmount: null
     }
     this.state={
-      userId:null
+      expenseCategory:"",
+      expenseAmount:"",
+        userId:null
     }
-console.log(firebase.auth().user)
+
   }  componentDidMount(){
       var base=this;
      firebase.auth().onAuthStateChanged(function(user) {
@@ -30,8 +32,9 @@ console.log(firebase.auth().user)
     }
   SaveValues() {
 var userId=this.state.userId.uid;
-var expenseCategory=this.expenseCategory;
-var expenseAmount=this.expenseAmount;
+var expenseCategory=this.state.expenseCategory;
+var expenseAmount=this.state.expenseAmount;
+var base=this;
     firebase.database().ref('/users/' + userId+"/expense").once('value').then(function(snapshot) {
 var objectValues=snapshot.val();
 var count;
@@ -41,8 +44,9 @@ if(objectValues===null)
 }else {
   count=(Object.entries(objectValues).length);
 }
-console.log(count)
-firebase.database().ref('users/' + userId+"/expense/"+count).set({
+base.setState({expenseCategory:"",expenseAmount:""})
+
+firebase.database().ref('users/' + userId+"/expense/").push({
 
 "expenseCategory": expenseCategory,
 "expenseAmount" : expenseAmount
@@ -60,16 +64,18 @@ firebase.database().ref('users/' + userId+"/expense/"+count).set({
           textAlign: "center"
         }}>
           <Textfield onChange={(event) => {
-          this.expenseCategory = event.target.value
-          }} label="Expense Category..." style={{
+          this.setState({expenseCategory : event.target.value})
+        }} value={this.state.expenseCategory}label="Expense Category..." type={"text"} style={{
             width: '200px'
-          }}/><Textfield onChange={(event) => {
-        this.expenseAmount = event.target.value
-      }} pattern="-?[0-9]*(\.[0-9]+)?" error="Input is not a number!" label="Amount" style={{
+          }}/>
+          <Textfield value={this.state.expenseAmount}onChange={(event) => {
+        this.setState({expenseAmount: event.target.value})
+      }} type={"text" }label="Amount" style={{
         width: '200px'
       }}/>
           <Button raised accent ripple onClick={this.SaveValues}>Add</Button>
         </Cell>
+        <GetValues></GetValues>
       </Grid>
     )
   }

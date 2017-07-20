@@ -4,8 +4,8 @@ class Navigate extends Component{
     render(){
         return(
             <div style={{position: 'relative'}}>
-   
-        <Header title={<span><strong>Expense Manger </strong></span>}>
+
+        <Header title={<span>Expense Manger </span>}>
         </Header>
 </div>
         )
