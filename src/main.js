@@ -74,8 +74,8 @@ firebase.database().ref('users/' + userId+"/expense/").push({
         width: '200px'
       }}/>
           <Button raised accent ripple onClick={this.SaveValues}>Add</Button>
-        </Cell>
-        <GetValues></GetValues>
+        </Cell><Cell col={4}></Cell>
+        <GetValues userId={this.state.userId}></GetValues>
       </Grid>
     )
   }
