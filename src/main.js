@@ -23,6 +23,7 @@ class Main extends Component {
      base.setState({
           userId:user
         });
+        base.props.userId
     } else {
         base.setState({
           userId:null
