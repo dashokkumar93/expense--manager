@@ -1,5 +1,6 @@
 import React,{Component} from 'react';
 import firebase from './FirebaseAuth';
+import{ DataTable,TableHeader} from 'react-mdl'
 class GetValues extends Component
 {
 constructor(props)
@@ -8,7 +9,10 @@ constructor(props)
   this.funFunction=this.funFunction.bind(this);
   console.log(props);
   this.state={
-    userId:null
+    userId:null,
+    expenseValues:{
+
+    }
   }
 }
 funFunction(){
@@ -27,27 +31,57 @@ componentDidUpdate()
   }
 }
 getValuesForUserId(id){
-  console.log(id);
+  var base=this;
   firebase.database().ref('/users/' + id+"/expense").once('value').then(function(snapshot) {
 var objectValues=snapshot.val();
-console.log(objectValues,id);
+base.setState({expenseValues:objectValues})
 });
 }
 
-  componentDidMount(){
-
-
-//   var starCountRef = firebase.database().ref('posts/' + postId + '/starCount');
-// starCountRef.on('value', function(snapshot) {
-//   updateStarCount(postElement, snapshot.val());
-// });
-}
 render(){
   return(
     <div>
-      <h1 onClick={this.funFunction}>Hello</h1>
+      <DisplayValues previousValues={this.state.expenseValues}></DisplayValues>
     </div>
   )
 }
 }
+class DisplayValues extends Component{
+  constructor(){
+    super();
+    this.state={
+      previousValues:""
+    }
+  }
+  componentWillReceiveProps(){
+    console.log(this.state.previousValues)
+  }
+  componentDidMount(){
+    console.log(this.props.previousValues)
+  }
+  renderValues(values){
+    var a=[];
+for(var property in values)
+{if(values[property].expenseAmount!==undefined)
+a.push({category:values[property].expenseCategory,amount:values[property].expenseAmount})
+}console.log(a)
+return<DataTable className="mdl-data-table mdl-shadow--2dp"
+    shadow={0}
+    rows={a}
+>
+    <TableHeader name="category" tooltip="Expense Category">Category</TableHeader>
+    <TableHeader numeric name="amount" tooltip="Expense Amount">Amount</TableHeader>
+</DataTable>
+  }
+  render(){
+    return(
+      <div className="mdl-cell mdl-cell--4-col">
+        {
+    this.renderValues(this.props.previousValues)
+        }
+    </div>
+    )
+  }
+}
+
 export default GetValues;
