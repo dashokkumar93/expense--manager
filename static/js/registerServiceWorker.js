@@ -30,7 +30,7 @@ export default function register() {
     }
 
     window.addEventListener('load', () => {
-      const swUrl = `https://dashokkumar93.github.io/expense--manager/service-worker.js`;
+      const swUrl = 'https://dashokkumar93.github.io/expense--manager/service-worker.js';
 
       if (!isLocalhost) {
         // Is not local host. Just register service worker
