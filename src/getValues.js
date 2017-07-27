@@ -11,7 +11,6 @@ constructor(props)
   this.state={
     userId:null,
     expenseValues:{
-
     }
   }
 }
@@ -21,7 +20,7 @@ funFunction(){
 componentDidUpdate()
 {var id=this.props.userId.uid;
 
-  if(id!=this.state.userId)
+  if(id!==this.state.userId)
   {
     if(this.state.userId!==id)
     {

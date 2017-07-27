@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import {Textfield, Button, Grid, Cell} from 'react-mdl';
+import {Textfield, Button, Grid, Cell, Snackbar} from 'react-mdl';
 import GetValues from "./getValues";
 import firebase from './FirebaseAuth';
+import './main.css';
 class Main extends Component {
   constructor() {
     super();
@@ -10,49 +11,56 @@ class Main extends Component {
       expenseCategory: null,
       expenseAmount: null
     }
-    this.state={
-      expenseCategory:"",
-      expenseAmount:"",
-        userId:null
+    this.handleShowSnackbar = this.handleShowSnackbar.bind(this);
+    this.handleTimeoutSnackbar = this.handleTimeoutSnackbar.bind(this);
+    this.handleClickActionSnackbar = this.handleClickActionSnackbar.bind(this);
+    this.state = {
+      expenseCategory: "",
+      expenseAmount: "",
+      userId: null,
+      isSnackbarActive: false
     }
 
-  }  componentDidMount(){
-      var base=this;
-     firebase.auth().onAuthStateChanged(function(user) {
-    if (user) {
-     base.setState({
-          userId:user
-        });
-        base.props.userId
-    } else {
-        base.setState({
-          userId:null
-        });
-    }
-  });
-    }
+  }
+  componentDidMount() {
+    var base = this;
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        base.setState({userId: user});
+
+      } else {
+        base.setState({userId: null});
+      }
+    });
+  }
+  handleTimeoutSnackbar() {
+    this.setState({isSnackbarActive: false});
+  }
+  handleClickActionSnackbar() {
+    this.setState({btnBgColor: 'red'});
+  }
+  handleShowSnackbar() {
+    this.setState({
+      isSnackbarActive: true,
+      btnBgColor: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16)
+    });
+  }
   SaveValues() {
-var userId=this.state.userId.uid;
-var expenseCategory=this.state.expenseCategory;
-var expenseAmount=this.state.expenseAmount;
-var base=this;
-    firebase.database().ref('/users/' + userId+"/expense").once('value').then(function(snapshot) {
-var objectValues=snapshot.val();
-var count;
-if(objectValues===null)
-{
-  count=0
-}else {
-  count=(Object.entries(objectValues).length);
-}
-base.setState({expenseCategory:"",expenseAmount:""})
+    var userId = this.state.userId.uid;
+    var expenseCategory = this.state.expenseCategory;
+    var expenseAmount = this.state.expenseAmount;
+    var base = this;
+    if(expenseCategory===""|| expenseAmount==="")
+    {
+        this.handleShowSnackbar();
+        return;
+    }
+    firebase.database().ref('/users/' + userId + "/expense").once('value').then(function(snapshot) {
 
-firebase.database().ref('users/' + userId+"/expense/").push({
+      base.setState({expenseCategory: "", expenseAmount: ""})
 
-"expenseCategory": expenseCategory,
-"expenseAmount" : expenseAmount
-});
-});
+      firebase.database().ref('users/' + userId + "/expense/").push({"expenseCategory": expenseCategory, "expenseAmount": expenseAmount});
+    });
 
   }
   render()
@@ -64,19 +72,24 @@ firebase.database().ref('users/' + userId+"/expense/").push({
         <Cell col={4} style={{
           textAlign: "center"
         }}>
-          <Textfield onChange={(event) => {
-          this.setState({expenseCategory : event.target.value})
-        }} value={this.state.expenseCategory}label="Expense Category..." type={"text"} style={{
+          <Textfield label="Expense Category..." onChange={(event) => {
+            this.setState({expenseCategory: event.target.value})
+          }} value={this.state.expenseCategory} type={"text"} style={{
             width: '200px'
           }}/>
-          <Textfield value={this.state.expenseAmount}onChange={(event) => {
-        this.setState({expenseAmount: event.target.value})
-      }} type={"text" }label="Amount" style={{
-        width: '200px'
-      }}/>
+          <Textfield onChange={(event) => {
+            this.setState({expenseAmount: event.target.value})
+          }} label="Amount" value={this.state.expenseAmount} type={"text"} style={{
+            width: '200px'
+          }}/>
           <Button raised accent ripple onClick={this.SaveValues}>Add</Button>
-        </Cell><Cell col={4}></Cell>
-          <Cell col={4}></Cell>      <GetValues class="mdl-cell mdl-cell--4-col" userId={this.state.userId}></GetValues>   <Cell col={4}></Cell>
+        </Cell>
+        <Cell col={4}></Cell>
+        <Cell col={4}></Cell>
+        <GetValues userId={this.state.userId}></GetValues>
+        <Cell col={4}></Cell>
+
+        <Snackbar active={this.state.isSnackbarActive} onClick={this.handleClickActionSnackbar} onTimeout={this.handleTimeoutSnackbar} action="Warning">Please Enter the value to proceed further.</Snackbar>
       </Grid>
     )
   }

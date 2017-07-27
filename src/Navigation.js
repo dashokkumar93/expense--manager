@@ -1,12 +1,13 @@
 import React,{Component} from 'react';
-import {Layout,Header,Navigation,Drawer,Content} from 'react-mdl'
+import {Header,Layout} from 'react-mdl'
 class Navigate extends Component{
     render(){
         return(
             <div style={{position: 'relative'}}>
 
-        <Header title={<span>Expense Manger </span>}>
+        <Header title="Expense Manager">
         </Header>
+
 </div>
         )
     }
